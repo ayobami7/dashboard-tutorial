@@ -14,9 +14,9 @@ const DealsChart = () => {
     const {data} = useList<GetFieldsFromList<DashboardDealsChartQuery>>({
         resource: 'dealStages',
         filters: [{
-            field: 'title', operator: 'in', value:['WON, LOST']
+            field: 'title', operator:'in', value:['WON', 'LOST']
         }],
-        meta:{
+        meta: {
             gqlQuery: DASHBOARD_DEALS_CHART_QUERY
         }
     });
@@ -40,11 +40,14 @@ const DealsChart = () => {
         yAxis: {
             tickCount: 4,
             label:{
-                formatter: (v:string) =>{
+                formatter: (v: string) =>{
                     return `$${Number(v)/1000}k`
                 }
             }
         },
+        // xAxis:{
+        //     tickCount: 5
+        // },
         tooltip:{
             formatter: (data) => {
                 return{

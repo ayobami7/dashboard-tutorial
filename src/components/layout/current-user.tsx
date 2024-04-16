@@ -1,7 +1,7 @@
 import { Popover, Button} from "antd"
 import CustomAvatar from "../custom-avatar"
 import { useGetIdentity } from "@refinedev/core"
-import type{User} from '@/graphql/schema.types'
+import type {User} from '@/graphql/schema.types'
 import { Text } from "../text"
 import { SettingOutlined } from "@ant-design/icons"
 import { useState } from "react"
