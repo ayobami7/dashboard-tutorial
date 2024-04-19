@@ -56,7 +56,7 @@ const LatestActivities = () => {
         {isLoading ? (
             <List
                 itemLayout='horizontal'
-                dataSource = {Array.from( {length:5} ).map( (_, i) => ({id:i}) )}
+                dataSource = {Array.from( {length: 5} ).map( (_, i) => ({id:i}) )}
                 renderItem ={(_, index) => (
                     <LatestActivitiesSkeleton key={index} />
                  )}
@@ -81,10 +81,10 @@ const LatestActivities = () => {
                             }
                             description={
                                 <Space size={4} >
-                                    <Text strong>{item.user?.name}</Text>
-                                    <Text>{ item.action === 'CREATE' ? 'created' : 'moved'}</Text>
+                                    <Text strong>{item.user?.name } </Text>
+                                    <Text>{item.action === 'CREATE' ? 'created' : 'moved'}</Text>
                                     <Text strong>{deal?.title} </Text>
-                                    <Text>{item.action ==='CREATE' ? 'in': 'to'} </Text>
+                                    <Text>{item.action === 'CREATE' ? 'in': 'to'} </Text>
                                     <Text strong>{deal?.stage?.title } </Text>
                                 </Space>}
                             >

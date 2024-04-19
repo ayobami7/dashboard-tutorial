@@ -24,7 +24,10 @@ import Layout from "./components/layout";
 import {dataProvider, liveProvider} from './providers'
 import { authProvider } from "./providers";
 import { resources } from "./config/resources";
-import ComapnyList from "./pages/companyList";
+import CompanyList from "./pages/company/list";
+import Create from './pages/company/create'
+import EditPage from "./pages/company/edit";
+import TasksList from "./pages/tasks/list";
 
 // const API_URL = "https://api.nestjs-query.refine.dev/graphql";
 // const WS_URL = "wss://api.nestjs-query.refine.dev/graphql";
@@ -74,7 +77,14 @@ function App() {
                     }
                   >
                     <Route index element={<Home />} />
-                    <Route path="/companies" element={<ComapnyList />} />
+                    <Route path="/companies" >
+                      <Route index element={<CompanyList />} />
+                      <Route path='new' element={<Create />} />
+                      <Route path='edit/:id' element={<EditPage/>} />
+                    </Route>
+                    <Route path="/tasks">
+                      <Route index element={<TasksList />} />
+                    </Route>
                   </Route>
 
                   
