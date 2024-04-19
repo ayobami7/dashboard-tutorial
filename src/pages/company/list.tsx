@@ -20,11 +20,11 @@ export const CompanyList  = ({children}: React.PropsWithChildren ) => {
 
   const {tableProps, filters} = useTable<Company>({
     resource: 'companies',
-    onSearch: (values)=>{
+    onSearch: (values: any) => {
       return [{
         field: 'name',
         operator: 'contains',
-        value: values.name
+        value: values.name,
       }]
     },
     pagination:{

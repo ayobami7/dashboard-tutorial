@@ -1,7 +1,9 @@
 import { Text } from '@/components/text'
 import { User } from '@/graphql/schema.types'
+import { getDateColor } from '@/utilities'
 import { ClockCircleOutlined, EyeOutlined } from '@ant-design/icons'
 import { Card, ConfigProvider, Dropdown, MenuProps, Tag, theme } from 'antd'
+import dayjs from 'dayjs'
 import React, { useMemo } from 'react'
 
 type ProjectCardProps ={
@@ -81,7 +83,7 @@ const ProjectCard = ({id, title, dueDate, users}: ProjectCardProps) => {
                 </Dropdown>
             }
         >
-            <TextIcon style={{marginRIght: '4px'}}/>
+            {/* <TextIcon style={{marginRIght: '4px'}}/> */}
             {dueDateOptions && (
                 <Tag
                     icon ={
