@@ -1,7 +1,7 @@
 import { Text } from '@/components/text'
 import { User } from '@/graphql/schema.types'
-import { EyeOutlined } from '@ant-design/icons'
-import { Card, ConfigProvider, Dropdown, MenuProps, theme } from 'antd'
+import { ClockCircleOutlined, EyeOutlined } from '@ant-design/icons'
+import { Card, ConfigProvider, Dropdown, MenuProps, Tag, theme } from 'antd'
 import React, { useMemo } from 'react'
 
 type ProjectCardProps ={
@@ -40,13 +40,24 @@ const ProjectCard = ({id, title, dueDate, users}: ProjectCardProps) => {
             }
         ]
         return dropdownItems
-    })
+    }, [])
+
+    const dueDateOptions = useMemo( ()=>{
+        if(!dueDate)
+            return null;
+
+        const date = dayjs(dueDate);
+        return {
+            color: getDateColor({date:dueDate}) as string,
+            text: date.format('MMM DD')
+        }
+    },  [dueDate]);
 
   return (
     <ConfigProvider
         theme={{
             components:{
-                Tag:{
+                Tag:{ 
                     colorText: token.colorTextSecondary
                 },
                 Card:{
@@ -70,7 +81,16 @@ const ProjectCard = ({id, title, dueDate, users}: ProjectCardProps) => {
                 </Dropdown>
             }
         >
+            <TextIcon style={{marginRIght: '4px'}}/>
+            {dueDateOptions && (
+                <Tag
+                    icon ={
+                        <ClockCircleOutlined style={{fontSize:'12px'}} />
+                    }
+                >
 
+                </Tag>
+            )}
         </Card>
     </ConfigProvider>
   )
