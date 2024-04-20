@@ -4,10 +4,13 @@ import KanbanColumn from './kanban/column'
 import KanbanItem from './item'
 import { useList } from '@refinedev/core'
 import { TASKS_QUERY, TASK_STAGES_QUERY } from '@/graphql/queries'
-import { TaskStage } from '@/graphql/schema.types'
+// import { TaskStage } from '@/graphql/schema.types'
 import { GetFieldsFromList } from '@refinedev/nestjs-query'
-import { TasksQuery } from '@/graphql/types'
+import { TaskStagesQuery, TasksQuery } from '@/graphql/types'
 import ProjectCard from './kanban/card'
+
+type Task = GetFieldsFromList<TasksQuery>
+type TaskStage = GetFieldsFromList<TaskStagesQuery> & {tasks: Task[]}
 
 const TasksList = () => {
     const { data: stages, isLoading: isLoadingStages } = useList<TaskStage>({

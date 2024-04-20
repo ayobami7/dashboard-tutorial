@@ -4,7 +4,7 @@ import { COMPANIES_LIST_QUERY } from '@/graphql/queries';
 // import { Company } from '@/graphql/schema.types';
 import { SearchOutlined } from '@ant-design/icons';
 import { CreateButton, FilterDropdown, List, useTable, EditButton, DeleteButton } from '@refinedev/antd';
-import { getDefaultFilter, useGo } from '@refinedev/core';
+import { HttpError, getDefaultFilter, useGo } from '@refinedev/core';
 import { Input, Space, Table } from 'antd';
 import { currencyNumber } from '@/utilities'
 import React from 'react'
@@ -18,7 +18,7 @@ export const CompanyList  = ({children}: React.PropsWithChildren ) => {
 
   const go = useGo();
 
-  const {tableProps, filters} = useTable<Company>({
+  const {tableProps, filters} = useTable<Company, HttpError, Company>({
     resource: 'companies',
     onSearch: (values: any) => {
       return [{
