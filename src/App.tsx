@@ -28,6 +28,8 @@ import CompanyList from "./pages/company/list";
 import Create from './pages/company/create'
 import EditPage from "./pages/company/edit";
 import TasksList from "./pages/tasks/list";
+import CreateTasks from "./pages/tasks/create";
+import EditTasks from "./pages/tasks/edit";
 
 // const API_URL = "https://api.nestjs-query.refine.dev/graphql";
 // const WS_URL = "wss://api.nestjs-query.refine.dev/graphql";
@@ -77,13 +79,19 @@ function App() {
                     }
                   >
                     <Route index element={<Home />} />
+
                     <Route path="/companies" >
                       <Route index element={<CompanyList />} />
                       <Route path='new' element={<Create />} />
                       <Route path='edit/:id' element={<EditPage/>} />
                     </Route>
-                    <Route path="/tasks">
-                      <Route index element={<TasksList />} />
+
+                    <Route path="/tasks" element={<TasksList>
+                        <Outlet/>
+                      </TasksList>}
+                    >
+                      <Route path='new' element={<CreateTasks />} />
+                      <Route path='edit/:id' element={<EditTasks/>} />
                     </Route>
                   </Route>
 

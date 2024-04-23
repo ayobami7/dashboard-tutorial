@@ -2,17 +2,23 @@ import React from 'react'
 import { KanbanBoardContainer, KanbanBoard } from './kanban/board'
 import KanbanColumn from './kanban/column'
 import KanbanItem from './item'
-import { useList } from '@refinedev/core'
+import { useList, useNavigation, useUpdate } from '@refinedev/core'
 import { TASKS_QUERY, TASK_STAGES_QUERY } from '@/graphql/queries'
-// import { TaskStage } from '@/graphql/schema.types'
 import { GetFieldsFromList } from '@refinedev/nestjs-query'
 import { TaskStagesQuery, TasksQuery } from '@/graphql/types'
-import ProjectCard from './kanban/card'
+import ProjectCard, { ProjectCardMemo } from './kanban/card'
+import { KanbanAddCardButton } from './kanban/add-card-button'
+import { KanbanColumnSkeleton, ProjectCardSkeleton } from '@/components'
+import { DragEndEvent } from '@dnd-kit/core'
+import { UPDATE_TASK_STAGE_MUTATION } from '@/graphql/mutation'
 
 type Task = GetFieldsFromList<TasksQuery>
 type TaskStage = GetFieldsFromList<TaskStagesQuery> & {tasks: Task[]}
 
-const TasksList = () => {
+const TasksList = ({children}: React.PropsWithChildren) => {
+
+    const { replace } = useNavigation()
+
     const { data: stages, isLoading: isLoadingStages } = useList<TaskStage>({
         resource: "taskStages",
         filters: [
@@ -50,6 +56,8 @@ const TasksList = () => {
         }
     })
 
+    const {mutate: updateTask} = useUpdate();
+
     // group tasks by stage
     // it's convert Task[] to TaskStage[] (group by stage) for kanban
     // uses `stages` and `tasks` from useList hooks
@@ -75,18 +83,50 @@ const TasksList = () => {
     }, [tasks, stages]);
 
     const handleAddCard = (args: { stageId: string }) => {
-        // const path =
-        //   args.stageId === "unassigned"
-        //     ? "/tasks/new"
-        //     : `/tasks/new?stageId=${args.stageId}`;
+        const path =
+          args.stageId === "unassigned"
+            ? "/tasks/new"
+            : `/tasks/new?stageId=${args.stageId}`;
     
-        // replace(path);
+        replace(path);
       };
+
+
+    const handleOnDragEnd = (event: DragEndEvent) => {
+        let stageId = event.over?.id as undefined | string | null;
+        const taskId = event.active.id as string;
+        const taskStageId = event.active.data.current?.stageId;
+    
+        if (taskStageId === stageId) {
+          return;
+        }
+    
+        if (stageId === "unassigned") {
+          stageId = null;
+        }
+    
+        updateTask({
+          resource: "tasks",
+          id: taskId,
+          values: {
+            stageId: stageId,
+          },
+          successNotification: false,
+          mutationMode: "optimistic",
+          meta: {
+            gqlMutation: UPDATE_TASK_STAGE_MUTATION,
+          },
+        });
+      };
+
+    const isLoading = isLoadingTasks || isLoadingStages;
+
+    if(isLoading) return <PageSkeleton/>
 
   return (
     <>
         <KanbanBoardContainer>
-            <KanbanBoard>
+            <KanbanBoard onDragEnd={handleOnDragEnd}>
                 <KanbanColumn
                     id={"unassigned"}
                     title={"unassigned"}
@@ -100,23 +140,78 @@ const TasksList = () => {
                             id={task.id}
                             data={{ ...task, stageId: "unassigned" }}
                             >
-                            <ProjectCard
+                            <ProjectCardMemo
                                 {...task}
                                 dueDate={task.dueDate || undefined}
                             />
                             </KanbanItem>
                         );
                     })}
-                    {/* {!taskStages.unassignedStage?.length && (
+
+                    {!taskStages.unassignedStage?.length && (
                         <KanbanAddCardButton
                             onClick={() => handleAddCard({ stageId: "unassigned" })}
                         />
-                    )} */}
+                    )}
                 </KanbanColumn>
+
+                {taskStages.columns?.map((column) => {
+                    return (
+                    <KanbanColumn
+                        key={column.id}
+                        id={column.id}
+                        title={column.title}
+                        count={column.tasks.length}
+                        onAddClick={() => handleAddCard({ stageId: column.id })}
+                    >
+                        {isLoading && <ProjectCardSkeleton />}
+                        {!isLoading &&
+                        column.tasks.map((task) => {
+                            return (
+                            <KanbanItem key={task.id} id={task.id} data={task}>
+                                <ProjectCardMemo
+                                {...task}
+                                dueDate={task.dueDate || undefined}
+                                />
+                            </KanbanItem>
+                            );
+                        })}
+                        {!column.tasks.length && (
+                        <KanbanAddCardButton
+                            onClick={() =>
+                            handleAddCard({
+                                stageId: column.id,
+                            })
+                            }
+                        />
+                        )}
+                    </KanbanColumn>
+                    );
+                })}
             </KanbanBoard>
         </KanbanBoardContainer>
+        {children}
     </>
   )
 }
 
 export default TasksList
+
+const PageSkeleton =()=>{
+    const columnCount = 6;
+    const itemCount = 4;
+
+    return (
+        <KanbanBoardContainer>
+            {Array.from({ length: columnCount }).map((_, index) => {
+                return (
+                    <KanbanColumnSkeleton key={index}>
+                        {Array.from({ length: itemCount }).map((_, index) => {
+                        return <ProjectCardSkeleton key={index} />;
+                        })}
+                    </KanbanColumnSkeleton>
+                );
+            })}
+        </KanbanBoardContainer>
+    );
+}
